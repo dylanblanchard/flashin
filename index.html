@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Flashin">
+  <meta name="theme-color" content="#5b9e8f">
+  <meta name="description" content="Mandarin SRS Flashcard PWA">
+  <title>Flashin</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Home View -->
+    <div id="view-home" class="view hidden">
+      <header class="app-header">
+        <h1 class="app-title">闪卡</h1>
+        <button id="btn-admin" class="icon-btn" aria-label="Admin settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </header>
+      <main class="home-main">
+        <div class="streak-display">
+          <span id="streak-count" class="streak-number">0</span>
+          <span class="streak-label">day streak</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span id="due-count" class="stat-number">0</span>
+            <span class="stat-label">due today</span>
+          </div>
+          <div class="stat-card">
+            <span id="new-count" class="stat-number">0</span>
+            <span class="stat-label">new cards</span>
+          </div>
+        </div>
+        <button id="btn-start" class="btn-primary">Start Review</button>
+        <p id="no-cards-msg" class="muted-text hidden">No cards due. Check back tomorrow or add more cards.</p>
+      </main>
+    </div>
+
+    <!-- Review View -->
+    <div id="view-review" class="view hidden">
+      <header class="review-header">
+        <button id="btn-back-home" class="icon-btn" aria-label="Back to home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <div class="progress-bar-wrap">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <span id="progress-text" class="progress-text">0 / 0</span>
+      </header>
+      <main class="review-main">
+        <div id="card-scene" class="card-scene">
+          <div id="flashcard" class="flashcard">
+            <div class="card-face card-front">
+              <p id="card-english" class="card-english"></p>
+            </div>
+            <div class="card-face card-back">
+              <p id="card-pinyin" class="card-pinyin"></p>
+              <p id="card-characters" class="card-characters"></p>
+              <button id="btn-tts" class="tts-btn hidden" aria-label="Read aloud">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="card-tap-hint" class="tap-hint">Tap card to reveal</div>
+        <div id="grade-buttons" class="grade-buttons hidden">
+          <button id="btn-again" class="grade-btn grade-again">
+            <span class="grade-icon">🔁</span>
+            <span class="grade-label">Again</span>
+          </button>
+          <button id="btn-got-it" class="grade-btn grade-got-it">
+            <span class="grade-icon">✓</span>
+            <span class="grade-label">Got it</span>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Session Complete View -->
+    <div id="view-complete" class="view hidden">
+      <main class="complete-main">
+        <div class="complete-icon">✓</div>
+        <h2 class="complete-title">Session complete</h2>
+        <div class="complete-stats">
+          <div class="complete-stat">
+            <span id="complete-reviewed" class="complete-stat-number">0</span>
+            <span class="complete-stat-label">reviewed</span>
+          </div>
+          <div class="complete-stat">
+            <span id="complete-correct" class="complete-stat-number">0</span>
+            <span class="complete-stat-label">got it</span>
+          </div>
+          <div class="complete-stat">
+            <span id="complete-again" class="complete-stat-number">0</span>
+            <span class="complete-stat-label">again</span>
+          </div>
+        </div>
+        <button id="btn-done" class="btn-primary">Back to home</button>
+      </main>
+    </div>
+
+    <!-- Admin View -->
+    <div id="view-admin" class="view hidden">
+      <header class="app-header">
+        <button id="btn-back-admin" class="icon-btn" aria-label="Back to home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h2 class="view-title">Cards</h2>
+        <button id="btn-add-card" class="icon-btn icon-btn-accent" aria-label="Add card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </header>
+      <main class="admin-main">
+        <div id="card-list" class="card-list"></div>
+        <div class="danger-zone">
+          <button id="btn-reset-progress" class="btn-danger">Reset all progress</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Card Editor View -->
+    <div id="view-editor" class="view hidden">
+      <header class="app-header">
+        <button id="btn-back-editor" class="icon-btn" aria-label="Back to cards">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h2 id="editor-title" class="view-title">Add card</h2>
+      </header>
+      <main class="editor-main">
+        <div class="form-group">
+          <label class="form-label" for="paste-area">Paste 3-line format</label>
+          <textarea id="paste-area" class="form-textarea" rows="4" placeholder="You're my little kitty&#10;Nĩ shì wõ de xião mão&#10;你是我的小猫"></textarea>
+          <button id="btn-parse" class="btn-secondary">Parse</button>
+        </div>
+        <div class="form-divider">or edit fields directly</div>
+        <div class="form-group">
+          <label class="form-label" for="field-english">English</label>
+          <input id="field-english" class="form-input" type="text" placeholder="English translation">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-pinyin">Pinyin</label>
+          <input id="field-pinyin" class="form-input" type="text" placeholder="Pinyin with diacritics">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="field-characters">Characters</label>
+          <input id="field-characters" class="form-input" type="text" placeholder="汉字">
+        </div>
+        <button id="btn-save-card" class="btn-primary">Save card</button>
+        <button id="btn-delete-card" class="btn-danger hidden">Delete card</button>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
